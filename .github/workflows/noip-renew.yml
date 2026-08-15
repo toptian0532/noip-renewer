@@ -1,0 +1,36 @@
+name: No-IP Renewer
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'        # 每周一 09:00 UTC（远小于 30 天，安全）
+  workflow_dispatch:          # 可在 Actions 页面手动触发测试
+
+permissions:
+  contents: write             # 允许 workflow 自推时间戳，保持仓库活跃
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Run noip-renewer
+        run: |
+          docker run --rm \
+            --env NO_IP_USERNAME="${{ secrets.NO_IP_USERNAME }}" \
+            --env NO_IP_PASSWORD="${{ secrets.NO_IP_PASSWORD }}" \
+            --env NO_IP_TOTP_KEY="${{ secrets.NO_IP_TOTP_KEY }}" \
+            --env TRANSLATE_ENABLED=false \
+            simaofsilva/noip-renewer:alpine
+
+      - name: Heartbeat (keep repo active)
+        run: |
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > last-run.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add last-run.txt
+          git commit -m "chore: renewal heartbeat" || echo "nothing to commit"
+          git push
