@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v7.0.1
 
       - name: Validate ${{ inputs.dockerfile }}
-        uses: hadolint/hadolint-action@v3.4.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: ${{ inputs.dockerfile }}
           no-fail: true
@@ -28,7 +28,7 @@ jobs:
           output-file: ${{ inputs.dockerfile }}.sarif
 
       - name: Upload Hadolint results of ${{ inputs.dockerfile }}
-        uses: github/codeql-action/upload-sarif@v4.37.7
+        uses: github/codeql-action/upload-sarif@v4.38.2
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: ${{ inputs.dockerfile }}.sarif

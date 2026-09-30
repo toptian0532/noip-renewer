@@ -1,4 +1,4 @@
-FROM python:3.14.7-alpine@sha256:05b2b8b732ecd268fee8727a369f936f022d1321b59befd13c30ede22769dcdc AS builder
+FROM python:3.14.7-alpine@sha256:9e9fde4d32eedce0b661d9ab91e826b62dddf28e928c230ec55f1866cac66b01 AS builder
 
 # Prevent Python from writing out pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -26,7 +26,7 @@ RUN python3 -m venv ${VIRTUAL_ENV} && \
 
 
 
-FROM python:3.14.7-alpine@sha256:05b2b8b732ecd268fee8727a369f936f022d1321b59befd13c30ede22769dcdc
+FROM python:3.14.7-alpine@sha256:9e9fde4d32eedce0b661d9ab91e826b62dddf28e928c230ec55f1866cac66b01
 
 # renovate: datasource=pypi depName=pip versioning=pep440
 ARG PIP_VERSION="26.1.2"
@@ -41,26 +41,30 @@ ARG FONT_MOTO_VERSION="2026.06.01-r0"
 ARG GECKODRIVER_VERSION="0.37.1-r0"
 
 # renovate: datasource=repology depName=alpine_3_24/openssl versioning=loose
-ARG OPENSSL_VERSION="3.5.7-r0"
+ARG OPENSSL_VERSION="3.5.8-r0"
 
 # renovate: datasource=repology depName=alpine_3_24/expat versioning=loose
-ARG EXPAT_VERSION="2.8.2-r0"
+ARG EXPAT_VERSION="2.8.5-r0"
 
 # renovate: datasource=repology depName=alpine_3_24/sqlite versioning=loose
-ARG SQLITE_VERSION="3.53.2-r0"
+ARG SQLITE_VERSION="3.53.4-r0"
+
+# renovate: datasource=repology depName=alpine_3_24/util-linux versioning=loose
+ARG UTIL_LINUX_VERSION="2.42.3-r1"
 
 # renovate: datasource=repology depName=alpine_3_24/zlib versioning=loose
 ARG ZLIB_VERSION="1.3.2-r0"
 
 # Install required packages and apply fixes for vulnerabilities reported by Trivy
 RUN apk add --no-cache \
-			firefox="${FIREFOX_VERSION}" \
-			font-noto=="${FONT_MOTO_VERSION}" \
-			libcrypto3="${OPENSSL_VERSION}" \
-			libexpat="${EXPAT_VERSION}" \
-			libssl3="${OPENSSL_VERSION}" \
-			sqlite-libs="${SQLITE_VERSION}" \
-			zlib="${ZLIB_VERSION}" && \
+      firefox="${FIREFOX_VERSION}" \
+      font-noto="${FONT_MOTO_VERSION}" \
+      libcrypto3="${OPENSSL_VERSION}" \
+      libexpat="${EXPAT_VERSION}" \
+      libssl3="${OPENSSL_VERSION}" \
+      libuuid="${UTIL_LINUX_VERSION}" \
+      sqlite-libs="${SQLITE_VERSION}" \
+      zlib="${ZLIB_VERSION}" && \
     apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community geckodriver="${GECKODRIVER_VERSION}" && \
     ln -s /usr/bin/geckodriver /usr/local/bin/geckodriver && \
     /usr/local/bin/pip install --upgrade pip=="${PIP_VERSION}" && \
